@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishnu Priya | Habit & Journal Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Dark Theme (Default) - Slate/Zinc Palette */
+  --bg-main: #09090b;
+  --bg-card: #18181b;
+  --bg-elevated: #27272a;
+  --bg-hover: #3f3f46;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(255, 255, 255, 0.2);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  
+  /* Brand Colors */
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f46e5;
+  --accent-gradient: linear-gradient(135deg, #818cf8, #c084fc);
+  
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-danger: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+
+  /* Shadows & Radius */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.6);
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-head: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --nav-h: 72px;
+  --transition-fast: 0.15s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(0, 0, 0, 0.2);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-focus); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* NAVIGATION */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  background: rgba(var(--bg-main), 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+}
+.nav-logo {
+  font-family: var(--font-head);
+  font-weight: 800; font-size: 20px;
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: -0.5px;
+}
+.nav-logo span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition-smooth);
+  font-size: 16px;
+}
+.icon-btn:hover { color: var(--text-primary); border-color: var(--text-muted); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+
+/* LAYOUT */
+#app { padding-top: calc(var(--nav-h) + 32px); padding-bottom: 60px; max-width: 1000px; margin: 0 auto; padding-left: 24px; padding-right: 24px;}
+
+/* CARDS */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-smooth);
+  margin-bottom: 24px;
+}
+.card:hover { border-color: var(--border-focus); }
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-weight: 700; font-size: 18px;
+  display: flex; align-items: center; gap: 10px;
+  letter-spacing: -0.3px;
+}
+.card-title .icon { font-size: 20px; }
+.collapse-btn {
+  border: none; background: rgba(255,255,255,0.05);
+  width: 28px; height: 28px; border-radius: 50%;
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition-smooth);
+}
+.card-header:hover .collapse-btn { background: var(--bg-hover); color: var(--text-primary); }
+.collapsed .collapse-btn { transform: rotate(-90deg); }
+.card-body { overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+/* GRID */
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+
+/* STAT CHIPS */
+.stat-chip {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+.stat-chip::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--accent-gradient); opacity: 0; transition: var(--transition-smooth);
+}
+.stat-chip:hover { transform: translateY(-2px); border-color: var(--border-focus); box-shadow: var(--shadow-md); }
+.stat-chip:hover::before { opacity: 1; }
+.stat-chip .label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-chip .value { font-family: var(--font-head); font-size: 32px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.stat-chip .sub { font-size: 12px; color: var(--text-muted); }
+
+/* PROGRESS BAR */
+.progress-wrap { margin: 16px 0; }
+.progress-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
+.progress-bar { height: 10px; border-radius: var(--radius-full); background: var(--bg-elevated); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+.progress-fill { height: 100%; border-radius: var(--radius-full); background: var(--accent-gradient); transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* INPUTS */
+input, select, textarea {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 14px;
+  width: 100%;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+input:hover, select:hover, textarea:hover { border-color: var(--border-focus); }
+input:focus, select:focus, textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+textarea { resize: vertical; min-height: 120px; font-size: 15px; line-height: 1.6; }
+label { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500; }
+.field { margin-bottom: 16px; }
+.field-row { display: flex; gap: 16px; }
+.field-row .field { flex: 1; }
+
+/* BUTTONS */
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-xs);
+  border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  transition: all var(--transition-fast);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent-primary); color: #fff; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3); }
+.btn-primary:hover { background: var(--accent-primary-hover); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4); }
+.btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+.btn-danger { background: var(--color-danger-bg); color: var(--color-danger); border: 1px solid rgba(244,63,94,0.3); }
+.btn-danger:hover { background: rgba(244,63,94,0.25); border-color: var(--color-danger); }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+.btn-icon { width: 32px; height: 32px; padding: 0; flex-shrink: 0; }
+
+/* HABITS & MOOD */
+.habit-date-bar {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--bg-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px;
+}
+.habit-date-bar input[type=date] { flex: 1; border: none; background: none; padding: 0; font-size: 16px; font-family: var(--font-head); font-weight: 600; outline: none; }
+.habit-list { display: flex; flex-direction: column; gap: 12px; }
+.habit-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-main); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 16px;
+  transition: all var(--transition-fast); cursor: grab;
+}
+.habit-item:active { cursor: grabbing; }
+.habit-item:hover { border-color: var(--border-focus); box-shadow: var(--shadow-sm); }
+.habit-item.done { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
+.habit-item.dragging { opacity: 0.4; transform: scale(0.98); box-shadow: var(--shadow-lg); border-color: var(--accent-primary); }
+.drag-handle { color: var(--text-muted); cursor: grab; font-size: 16px; flex-shrink: 0; padding-right: 8px; }
+.habit-check {
+  width: 26px; height: 26px; flex-shrink: 0;
+  border-radius: 50%; border: 2px solid var(--border-focus);
+  cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.habit-check.checked { background: var(--color-success); border-color: var(--color-success); color: #fff; transform: scale(1.1); }
+.habit-name { flex: 1; font-size: 15px; font-weight: 500; }
+.habit-cat { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+.habit-streak { font-size: 13px; color: var(--color-warning); font-weight: 700; background: var(--color-warning-bg); padding: 4px 10px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 4px; }
+.mood-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.mood-btn {
+  padding: 10px 16px; border-radius: var(--radius-full);
+  border: 1px solid var(--border); background: var(--bg-main);
+  cursor: pointer; font-size: 20px; transition: var(--transition-fast);
+}
+.mood-btn:hover { transform: scale(1.1); border-color: var(--border-focus); }
+.mood-btn.active { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.15); transform: scale(1.1); box-shadow: 0 4px 12px rgba(99,102,241,0.2); }
+.habit-heatmap {
+  display: grid; grid-template-columns: repeat(53, 1fr);
+  gap: 3px; margin-top: 12px; overflow-x: auto; padding-bottom: 8px;
+}
+.hm-cell { width: 12px; height: 12px; border-radius: 3px; background: var(--bg-elevated); transition: var(--transition-fast); cursor: crosshair; }
+.hm-cell:hover { transform: scale(1.2); }
+.hm-cell.hm-1 { background: rgba(99, 102, 241, 0.3); }
+.hm-cell.hm-2 { background: rgba(99, 102, 241, 0.6); }
+.hm-cell.hm-3 { background: rgba(99, 102, 241, 0.85); }
+.hm-cell.hm-4 { background: var(--accent-primary); box-shadow: 0 0 6px rgba(99,102,241,0.6); }
+
+/* TOAST & MODAL */
+#toast-container { position: fixed; bottom: 32px; right: 32px; z-index: 999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 14px 20px; font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: all;
+  display: flex; align-items: center; gap: 10px;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
+.toast.out { animation: slideOut 0.3s ease forwards; }
+@keyframes slideOut { to { opacity: 0; transform: translateX(30px) scale(0.95); } }
+
+#modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  animation: fadeInModal 0.2s ease;
+}
+#modal-overlay.open { display: flex; }
+@keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 32px; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes popIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-title { font-family: var(--font-head); font-weight: 700; font-size: 22px; letter-spacing: -0.5px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: var(--bg-elevated);
+  color: var(--text-secondary); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);
+}
+.modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+.modal-footer { margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid var(--border); }
+
+/* MISC */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); background: var(--bg-main); border-radius: var(--radius-md); border: 1px dashed var(--border); }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+.section-title { font-family: var(--font-head); font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+
+@media(max-width: 768px) {
+  #nav { padding: 0 16px; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .section-title { font-size: 24px; }
+  .stat-chip .value { font-size: 28px; }
+  #app { padding-top: calc(var(--nav-h) + 20px); }
+}
+
+/* FAB */
+#fab {
+  position: fixed; bottom: 32px; right: 32px; z-index: 98;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--accent-gradient);
+  border: none; color: #fff; font-size: 28px; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition-smooth);
+}
+#fab:hover { transform: scale(1.05) translateY(-4px); box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6); }
+@media(max-width: 768px) { #fab { bottom: 20px; right: 20px; width: 56px; height: 56px; } }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">✨ <span>Vishnu Priya</span></div>
+  <div class="nav-actions">
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<button id="fab" title="Quick Add Habit" onclick="openAddHabitModal()">+</button>
+<div id="toast-container"></div>
+
+<div id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<div id="app">
+  <div class="section-header">
+    <div class="section-title">Habits & Journal</div>
+    <button class="btn btn-primary" onclick="openAddHabitModal()">+ Add Habit</button>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:24px" id="habit-stats-row">
+    <div class="stat-chip"><div class="label">Today</div><div class="value" id="hstat-today">0/0</div><div class="sub">completed</div></div>
+    <div class="stat-chip"><div class="label">Completion</div><div class="value" id="hstat-pct">0%</div></div>
+    <div class="stat-chip"><div class="label">Best Streak</div><div class="value" id="hstat-streak">0🔥</div></div>
+    <div class="stat-chip"><div class="label">Days Tracked</div><div class="value" id="hstat-days">0</div></div>
+  </div>
+
+  <div class="habit-date-bar">
+    <span style="font-size:20px">📅</span>
+    <input type="date" id="habit-date-picker">
+    <button class="btn btn-secondary btn-sm" onclick="goToday()">Today</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-title"><span class="icon">📝</span> Daily Journal & Mood</div>
+      <button class="collapse-btn">▼</button>
+    </div>
+    <div class="card-body">
+      <div class="mood-bar" id="mood-bar">
+        <button class="mood-btn" data-mood="😊" onclick="setMood(this)">😊</button>
+        <button class="mood-btn" data-mood="😐" onclick="setMood(this)">😐</button>
+        <button class="mood-btn" data-mood="😤" onclick="setMood(this)">😤</button>
+        <button class="mood-btn" data-mood="😴" onclick="setMood(this)">😴</button>
+        <button class="mood-btn" data-mood="🤩" onclick="setMood(this)">🤩</button>
+        <button class="mood-btn" data-mood="😔" onclick="setMood(this)">😔</button>
+      </div>
+      <textarea id="habit-notes" placeholder="How was your day, Vishnu Priya? Write your thoughts here..." oninput="saveNotes()"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-title"><span class="icon">✅</span> Today's Habits</div>
+      <button class="collapse-btn">▼</button>
+    </div>
+    <div class="card-body">
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Daily Progress</span><span id="habit-daily-pct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="habit-daily-bar" style="width:0%"></div></div>
+      </div>
+      <div class="habit-list" id="habit-list" ondragover="allowDrop(event)" ondrop="dropHabit(event)"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-title"><span class="icon">🗺️</span> Consistency Heatmap</div>
+      <button class="collapse-btn">▼</button>
+    </div>
+    <div class="card-body">
+      <div class="habit-heatmap" id="habit-heatmap"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:12px;font-size:12px;font-weight:500;color:var(--text-secondary)">
+        Less <div class="hm-cell"></div><div class="hm-cell hm-1"></div><div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div><div class="hm-cell hm-4"></div> More
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)) } catch { return null } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+
+function toast(msg, type='info') {
+  const c = $('#toast-container');
+  const t = document.createElement('div');
+  const icons = { info:'ℹ️', success:'✅', error:'❌', warn:'⚠️' };
+  t.className = 'toast';
+  t.innerHTML = `<span style="font-size:18px">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(()=>t.remove(),300) }, 3000);
+}
+
+function openModal(html, title) {
+  const o = $('#modal-overlay');
+  const m = $('#modal-content');
+  m.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">${title}</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    ${html}
+  `;
+  o.classList.add('open');
+}
+
+function closeModal() { $('#modal-overlay').classList.remove('open') }
+$('#modal-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal() });
+
+function toggleCard(header) {
+  const card = header.closest('.card');
+  card.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  body.style.maxHeight = card.classList.contains('collapsed') ? '0' : '';
+}
+
+function allowDrop(e) { e.preventDefault() }
+function genId(){ return Math.random().toString(36).slice(2,9) }
+
+// Theme
+let theme = LS.get('theme') || 'dark';
+applyTheme();
+$('#theme-toggle').addEventListener('click', () => {
+  theme = theme==='dark'?'light':'dark';
+  LS.set('theme',theme); applyTheme();
+});
+function applyTheme(){
+  document.documentElement.dataset.theme = theme;
+  $('#theme-toggle').textContent = theme==='dark'?'☀️':'🌙';
+}
+
+// ═══════════════════════════════════════════════════════
+//  HABITS & JOURNAL LOGIC
+// ═══════════════════════════════════════════════════════
+let habits = LS.get('vp_habits') || [
+  {id:genId(), name:'Drink 2L Water', cat:'Health', emoji:'💧'},
+  {id:genId(), name:'Morning Walk', cat:'Health', emoji:'🚶‍♀️'},
+  {id:genId(), name:'Read 10 Pages', cat:'Growth', emoji:'📚'},
+  {id:genId(), name:'Meditate 10 mins', cat:'Wellness', emoji:'🧘‍♀️'},
+];
+let habitData = LS.get('vp_habitData') || {};
+let dragSrcHabit = null;
+
+function getTodayStr(){ return new Date().toISOString().slice(0,10) }
+function getDateStr(){ return $('#habit-date-picker').value || getTodayStr() }
+function getDateData(dt){
+  if(!habitData[dt]) habitData[dt]={done:[], mood:'', notes:''};
+  return habitData[dt];
+}
+function saveHabits(){ LS.set('vp_habits', habits) }
+function saveHabitData(){ LS.set('vp_habitData', habitData) }
+
+// Init date picker
+$('#habit-date-picker').value = getTodayStr();
+$('#habit-date-picker').addEventListener('change', renderHabits);
+function goToday(){ $('#habit-date-picker').value=getTodayStr(); renderHabits() }
+
+function renderHabits(){
+  const dt = getDateStr();
+  const dd = getDateData(dt);
+  const list = $('#habit-list');
+  
+  if(!habits.length){
+    list.innerHTML='<div class="empty-state"><div style="font-size:32px; margin-bottom:12px">🌱</div><div>No habits yet. Let\'s build some good routines!</div></div>';
+  } else {
+    list.innerHTML = habits.map(h=>{
+      const done = dd.done.includes(h.id);
+      const streak = calcStreak(h.id);
+      return `<div class="habit-item ${done?'done':''}" draggable="true" 
+          data-id="${h.id}"
+          ondragstart="habitDragStart(event,'${h.id}')"
+          ondragover="event.preventDefault()"
+          ondrop="habitDrop(event,'${h.id}')">
+        <div class="drag-handle">⠿</div>
+        <div class="habit-check ${done?'checked':''}" onclick="toggleHabit('${h.id}')">
+          ${done?'✓':''}
+        </div>
+        <div style="flex:1">
+          <div class="habit-name"><span style="margin-right:6px">${h.emoji||'•'}</span> ${h.name}</div>
+          <div class="habit-cat">${h.cat||''}</div>
+        </div>
+        ${streak>0?`<div class="habit-streak">🔥 ${streak}</div>`:''}
+        <div class="habit-actions">
+          <button class="btn btn-sm btn-danger btn-icon" onclick="deleteHabit('${h.id}')">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  
+  // Update mood
+  $$('.mood-btn').forEach(b=>b.classList.toggle('active',b.dataset.mood===dd.mood));
+  
+  // Update notes
+  $('#habit-notes').value = dd.notes || '';
+  
+  // Update progress
+  const done = habits.filter(h=>dd.done.includes(h.id)).length;
+  const pct = habits.length ? Math.round(done/habits.length*100) : 0;
+  $('#habit-daily-bar').style.width = pct+'%';
+  $('#habit-daily-pct').textContent = pct+'%';
+  
+  updateHabitStats();
+  renderHeatmap();
+}
+
+function toggleHabit(id){
+  const dt=getDateStr();
+  const dd=getDateData(dt);
+  const idx=dd.done.indexOf(id);
+  if(idx>=0) dd.done.splice(idx,1); else dd.done.push(id);
+  saveHabitData(); renderHabits();
+}
+
+function deleteHabit(id){
+  habits=habits.filter(h=>h.id!==id);
+  saveHabits(); renderHabits();
+}
+
+function setMood(btn){
+  const dt=getDateStr();
+  const dd=getDateData(dt);
+  dd.mood = dd.mood===btn.dataset.mood?'':btn.dataset.mood;
+  saveHabitData(); renderHabits();
+}
+
+function saveNotes(){
+  const dt=getDateStr();
+  const dd=getDateData(dt);
+  dd.notes=$('#habit-notes').value;
+  saveHabitData();
+}
+
+function calcStreak(hid){
+  let streak=0, dt=new Date();
+  for(let i=0;i<365;i++){
+    const ds=dt.toISOString().slice(0,10);
+    if(habitData[ds]?.done?.includes(hid)) streak++;
+    else break;
+    dt.setDate(dt.getDate()-1);
+  }
+  return streak;
+}
+
+function updateHabitStats(){
+  const today=getTodayStr();
+  const dd=getDateData(today);
+  const done=habits.filter(h=>dd.done.includes(h.id)).length;
+  const total=habits.length;
+  const pct=total?Math.round(done/total*100):0;
+  
+  $('#hstat-today').textContent=`${done}/${total}`;
+  $('#hstat-pct').textContent=pct+'%';
+  $('#hstat-days').textContent=Object.keys(habitData).length;
+  
+  const best=habits.reduce((mx,h)=>Math.max(mx,calcStreak(h.id)),0);
+  $('#hstat-streak').textContent=best+'🔥';
+}
+
+// Drag and Drop Logic
+function habitDragStart(e,id){ dragSrcHabit=id }
+function habitDrop(e,id){
+  e.preventDefault();
+  if(dragSrcHabit===id) return;
+  const fromIdx=habits.findIndex(h=>h.id===dragSrcHabit);
+  const toIdx=habits.findIndex(h=>h.id===id);
+  const [item]=habits.splice(fromIdx,1);
+  habits.splice(toIdx,0,item);
+  saveHabits(); renderHabits();
+}
+
+function openAddHabitModal(){
+  openModal(`
+    <div class="field"><label>Habit Name</label><input type="text" id="ah-name" placeholder="e.g. Read before bed"></div>
+    <div class="field-row">
+      <div class="field"><label>Category</label><input type="text" id="ah-cat" placeholder="e.g. Wellness"></div>
+      <div class="field"><label>Emoji</label><input type="text" id="ah-emoji" placeholder="🌙" maxlength="2"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewHabit()">Add Habit</button>
+    </div>
+  `,'➕ Add Habit');
+}
+
+function saveNewHabit(){
+  const name=$('#ah-name').value.trim();
+  if(!name){toast('Enter a habit name','warn');return}
+  habits.push({id:genId(), name, cat:$('#ah-cat').value.trim(), emoji:$('#ah-emoji').value.trim()||'•'});
+  saveHabits(); renderHabits(); closeModal(); toast('Habit added','success');
+}
+
+function renderHeatmap(){
+  const hm=$('#habit-heatmap');
+  const cells=[];
+  const today=new Date();
+  for(let w=52;w>=0;w--){
+    for(let d=0;d<7;d++){
+      const dt=new Date(today);
+      dt.setDate(today.getDate()-(w*7)-(today.getDay()-d));
+      const ds=dt.toISOString().slice(0,10);
+      const dd=habitData[ds];
+      let lvl=0;
+      if(dd&&habits.length){
+        const pct=dd.done.length/habits.length;
+        if(pct>0.75) lvl=4; else if(pct>0.5) lvl=3; else if(pct>0.25) lvl=2; else if(pct>0) lvl=1;
+      }
+      cells.push(`<div class="hm-cell ${lvl?'hm-'+lvl:''}" title="${ds}"></div>`);
+    }
+  }
+  hm.innerHTML=cells.join('');
+}
+
+// Init
+renderHabits();
+</script>
+</body>
+</html>
